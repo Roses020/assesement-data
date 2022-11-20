@@ -24,11 +24,12 @@ module.exports = {
                 name varchar
             );
 
-            create table cities (
+            CREATE TABLE cities (
                 city_id serial primary key,
-                name varchar,
-                rating integer,
-                country_id integer
+                name VARCHAR(50),
+                rating INTEGER,
+                country_id INT NOT NULL REFERENCES
+                countries(country_id)
             );
 
             insert into countries (name)
@@ -234,17 +235,15 @@ module.exports = {
     },
 
     getCountries: (req, res) => {
-        sequelize.query(`select * from countries
-        `)
+        sequelize.query(`SELECT * FROM countries;`)
         .then(dbRes => res.status(200).send(dbRes[0]))
         .catch(err => console.log(err))
     },
 
     createCity: (req, res) => {
-        let {countryId, name, rating} = req.body
+        const {countryId, name, rating} = req.body
         sequelize.query(`INSERT INTO cities (name, rating, country_Id)
-        values(${name},${rating},${countryId})
-   `)
+        values ('${name}',${rating},${countryId})`)
         
         .then(dbRes => res.status(200).send(dbRes[0]))
         .catch(err => console.log('error in create City function', err))
@@ -259,9 +258,12 @@ module.exports = {
     },
 
     deleteCity: (req, res) => {
-        sequelize.query(`
-        `)
+        const {id} = req.params;
+        sequelize.query(`DELETE FROM cities
+        WHERE city_id = ${id};`)
         .then(dbRes => res.status(200).send(dbRes[0]))
         .catch(err => console.log('error in delete City function', err))
     }
 }
+
+
